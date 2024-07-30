@@ -30,7 +30,7 @@ migrations = [
 ]
 benches = ["proptest"]
 control_flow = ["futures", "tokio", "wasmtimer"]
-arbitrary = ["dep:arbitrary", "chrono/arbitrary", "indexmap/arbitrary"]
+arbitrary = ["dep:arbitrary", "chrono/arbitrary", "ibc/arbitrary", "indexmap/arbitrary"]
 
 [dependencies]
 namada_macros = {path = "../macros"}
