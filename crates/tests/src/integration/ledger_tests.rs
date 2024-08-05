@@ -9,7 +9,9 @@ use data_encoding::HEXLOWER;
 use namada::account::AccountPublicKeysMap;
 use namada::core::collections::HashMap;
 use namada::token::{self, Amount, DenominatedAmount};
-use namada_apps_lib::wallet::defaults::{self, get_unencrypted_keypair};
+use namada_apps_lib::wallet::defaults::{
+    self, get_unencrypted_keypair, is_use_device,
+};
 use namada_core::dec::Dec;
 use namada_core::hash::Hash;
 use namada_core::storage::{DbColFam, Epoch, Key};
@@ -28,10 +30,10 @@ use crate::e2e::setup::constants::{
     ALBERT, ALBERT_KEY, APFEL, BERTHA, BERTHA_KEY, BTC, CHRISTEL, CHRISTEL_KEY,
     DAEWON, DOT, ESTER, ETH, GOVERNANCE_ADDRESS, KARTOFFEL, NAM, SCHNITZEL,
 };
+use crate::e2e::setup::{apply_use_device, ensure_hot_key};
 use crate::integration::helpers::{
     find_address, prepare_steward_commission_update_data,
 };
-use crate::e2e::setup::{apply_use_device, ensure_hot_key, is_use_device};
 use crate::integration::setup;
 use crate::strings::{
     TX_APPLIED_SUCCESS, TX_INSUFFICIENT_BALANCE, TX_REJECTED,
@@ -190,7 +192,8 @@ fn ledger_txs_and_queries() -> Result<()> {
 
     for tx_args in &txs_args {
         for &dry_run in &[true, false] {
-            let tx_args = if dry_run && (tx_args[0] == "tx" || is_use_device()) {
+            let tx_args = if dry_run && (tx_args[0] == "tx" || is_use_device())
+            {
                 continue;
             } else if dry_run {
                 [tx_args.clone(), vec!["--dry-run"]].concat()
@@ -1680,7 +1683,9 @@ fn enforce_fee_payment() -> Result<()> {
     txs_bytes.push(std::fs::read(&file_path).unwrap());
     std::fs::remove_file(&file_path).unwrap();
 
-    let sk = get_unencrypted_keypair(&ensure_hot_key("albert-key").to_ascii_lowercase());
+    let sk = get_unencrypted_keypair(
+        &ensure_hot_key("albert-key").to_ascii_lowercase(),
+    );
     let pk = sk.to_public();
 
     let native_token = node
