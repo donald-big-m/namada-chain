@@ -31,7 +31,7 @@ use crate::e2e::setup::constants::{
 use crate::integration::helpers::{
     find_address, prepare_steward_commission_update_data,
 };
-use crate::e2e::setup::{apply_use_device, ensure_hot_key};
+use crate::e2e::setup::{apply_use_device, ensure_hot_key, is_use_device};
 use crate::integration::setup;
 use crate::strings::{
     TX_APPLIED_SUCCESS, TX_INSUFFICIENT_BALANCE, TX_REJECTED,
@@ -190,7 +190,7 @@ fn ledger_txs_and_queries() -> Result<()> {
 
     for tx_args in &txs_args {
         for &dry_run in &[true, false] {
-            let tx_args = if dry_run && tx_args[0] == "tx" {
+            let tx_args = if dry_run && (tx_args[0] == "tx" || is_use_device()) {
                 continue;
             } else if dry_run {
                 [tx_args.clone(), vec!["--dry-run"]].concat()
